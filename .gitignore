@@ -1,0 +1,4 @@
+venv/
+conditional_motion_generator/
+model_store/
+logs/
