@@ -1,0 +1,6 @@
+logs/
+model_store/
+model/
+venv/
+scipts/
+train.py

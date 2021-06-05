@@ -2,6 +2,10 @@ FROM pytorch/torchserve:0.4.0-cpu
 
 COPY handler.py conditional_motion_generator /home/model-server/
 
+USER root
+RUN printf "\nservice_envelope=json" >> /home/model-server/config.properties
+USER model-server
+
 RUN pip install --no-cache-dir transformers 
 
 RUN torch-model-archiver \
