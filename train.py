@@ -5,11 +5,10 @@ from pytorch_lightning.callbacks import ModelCheckpoint
 
 if __name__ == "__main__":
     parser = ArgumentParser()
-    parser.add_argument("--max_epochs", type=int, default=10)
-    parser.add_argument("--gpus", type=int, default=0)
     parser.add_argument("--save_top_k", type=int, default=1)
 
     parser = MotionGenerator.add_model_specific_args(parser)
+    parser = pl.Trainer.add_argparse_args(parser)
 
     args = parser.parse_args()
 
@@ -30,11 +29,9 @@ if __name__ == "__main__":
         mode="min"
     )
 
-    trainer = pl.Trainer(
-        checkpoint_callback=checkpoint_callback,
-        max_epochs=args.max_epochs,
-        gpus=args.gpus, 
-        progress_bar_refresh_rate=5
+    trainer = pl.Trainer.from_argparse_args(
+        args,
+        checkpoint_callback=checkpoint_callback
     )
 
     trainer.fit(model, datamodule=datamodule)
