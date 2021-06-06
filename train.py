@@ -17,7 +17,7 @@ if __name__ == "__main__":
 
     tokenizer = T5Tokenizer.from_pretrained(args.model_name)
     datamodule = MotionGeneratorDataModule(batch_size=args.batch_size, tokenizer=tokenizer)
-    model = MotionGenerator()
+    model = MotionGenerator(args.model_name)
 
     checkpoint_callback = ModelCheckpoint(
         dirpath="checkpoints",

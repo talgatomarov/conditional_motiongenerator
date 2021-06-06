@@ -2,9 +2,9 @@ import pytorch_lightning as pl
 from transformers import T5ForConditionalGeneration, AdamW
 
 class MotionGenerator(pl.LightningModule):
-  def __init__(self):
+  def __init__(self, model_name):
     super().__init__()
-    self.model = T5ForConditionalGeneration.from_pretrained('t5-small', return_dict=True)
+    self.model = T5ForConditionalGeneration.from_pretrained(model_name, return_dict=True)
 
   def forward(self, input_ids,  attention_mask, labels=None):
     output = self.model(
