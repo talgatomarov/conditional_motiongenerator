@@ -1,6 +1,6 @@
 from argparse import ArgumentParser
 import pytorch_lightning as pl
-from transformers import T5ForConditionalGeneration, AdamW
+from transformers import T5ForConditionalGeneration, T5TokenizerFast as T5Tokenizer, AdamW
 
 class MotionGenerator(pl.LightningModule):
   def __init__(self, model_name="t5-small", learning_rate=0.0001):
@@ -40,8 +40,13 @@ class MotionGenerator(pl.LightningModule):
   def configure_optimizers(self):
     return AdamW(self.parameters(), lr=self.hparams.learning_rate)
 
+  def get_tokenizer(self):
+    return T5Tokenizer.from_pretrained(self.hparams.model_name)
+
   @staticmethod
   def add_model_specific_args(parent_parser):
     parser = ArgumentParser(parents=[parent_parser], add_help=False)
+    parser.add_argument("--batch_size", type=int, default=16)
     parser.add_argument('--learning_rate', type=float, default=0.0001)
+    parser.add_argument('--model_name', type=str, default="t5-small")
     return parser

@@ -1,23 +1,25 @@
 from argparse import ArgumentParser
 from .model import MotionGeneratorDataModule, MotionGenerator
-from transformers import T5TokenizerFast as T5Tokenizer
 import pytorch_lightning as pl
 from pytorch_lightning.callbacks import ModelCheckpoint
 
 if __name__ == "__main__":
     parser = ArgumentParser()
-
-    parser.add_argument("--batch_size", type=int, default=1)
-    parser.add_argument("--model_name", type=str, default="t5-small")
     parser.add_argument("--max_epochs", type=int, default=10)
     parser.add_argument("--gpus", type=int, default=0)
     parser.add_argument("--save_top_k", type=int, default=1)
 
+    parser = MotionGenerator.add_model_specific_args(parser)
+
     args = parser.parse_args()
 
-    tokenizer = T5Tokenizer.from_pretrained(args.model_name)
+
+    model = MotionGenerator(
+        model_name=args.model_name,
+        learning_rate=args.learning_rate
+    )
+    tokenizer = model.get_tokenizer()
     datamodule = MotionGeneratorDataModule(batch_size=args.batch_size, tokenizer=tokenizer)
-    model = MotionGenerator(args.model_name)
 
     checkpoint_callback = ModelCheckpoint(
         dirpath="checkpoints",
