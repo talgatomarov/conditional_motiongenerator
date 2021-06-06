@@ -1,9 +1,11 @@
+from argparse import ArgumentParser
 import pytorch_lightning as pl
 from transformers import T5ForConditionalGeneration, AdamW
 
 class MotionGenerator(pl.LightningModule):
-  def __init__(self, model_name):
+  def __init__(self, model_name="t5-small", learning_rate=0.0001):
     super().__init__()
+    self.save_hyperparameters()
     self.model = T5ForConditionalGeneration.from_pretrained(model_name, return_dict=True)
 
   def forward(self, input_ids,  attention_mask, labels=None):
@@ -36,4 +38,10 @@ class MotionGenerator(pl.LightningModule):
     return loss
 
   def configure_optimizers(self):
-    return AdamW(self.parameters(), lr=0.0001)
+    return AdamW(self.parameters(), lr=self.hparams.learning_rate)
+
+  @staticmethod
+  def add_model_specific_args(parent_parser):
+    parser = ArgumentParser(parents=[parent_parser], add_help=False)
+    parser.add_argument('--learning_rate', type=float, default=0.0001)
+    return parser
