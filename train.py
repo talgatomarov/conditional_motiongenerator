@@ -25,6 +25,3 @@ if __name__ == "__main__":
     )
 
     trainer.fit(model, datamodule=datamodule)
-
-    model.save_pretrained("conditional_motion_generator")
-
