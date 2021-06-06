@@ -1,19 +1,21 @@
+from argparse import ArgumentParser
 import requests
 import os
 import pandas as pd
 from torch.utils.data import DataLoader, random_split
 import pytorch_lightning as pl
 
-from .MotionGeneratorDataset import MotionGeneratorDataset
+from MotionGeneratorDataset import MotionGeneratorDataset
 
 class MotionGeneratorDataModule(pl.LightningDataModule):
-  def __init__(self, batch_size, tokenizer):
+  def __init__(self, batch_size, data_url, tokenizer):
     super().__init__()
     self.batch_size = batch_size
+    self.data_url = data_url
     self.tokenizer = tokenizer
 
   def prepare_data(self):
-    response = requests.get('https://docs.google.com/spreadsheets/u/2/d/1qQlqFeJ3iYbzXYrLBMgbmT6LcJLj6JcG3LJyZSbkAJY/export?format=csv')
+    response = requests.get(self.data_url)
     assert response.status_code == 200, "Wrong status code"
 
     os.makedirs("data", exist_ok=True)
@@ -63,3 +65,16 @@ class MotionGeneratorDataModule(pl.LightningDataModule):
 
   def val_dataloader(self):
     return DataLoader(self.val_dataset, batch_size=self.batch_size)
+
+  @staticmethod
+  def add_argparse_args(parent_parser):
+    parser = ArgumentParser(parents=[parent_parser], add_help=False)
+
+    parser.add_argument("--batch_size", type=int, default=16)
+    parser.add_argument(
+      "--data-url",
+      type=str,
+      default="https://docs.google.com/spreadsheets/u/2/d/1qQlqFeJ3iYbzXYrLBMgbmT6LcJLj6JcG3LJyZSbkAJY/export?format=csv"
+    )
+
+    return parser
