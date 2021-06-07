@@ -4,3 +4,5 @@ model_store/
 logs/
 data/
 __pycache__/
+lightning_logs/
+checkpoints/
