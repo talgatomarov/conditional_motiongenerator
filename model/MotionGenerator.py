@@ -1,6 +1,6 @@
 from argparse import ArgumentParser
 import pytorch_lightning as pl
-from transformers import T5ForConditionalGeneration, T5TokenizerFast as T5Tokenizer, AdamW
+from transformers import T5ForConditionalGeneration, T5Tokenizer, AdamW
 
 class MotionGenerator(pl.LightningModule):
   def __init__(self, learning_rate, model_name, **kwargs):

@@ -8,11 +8,13 @@ import pytorch_lightning as pl
 from MotionGeneratorDataset import MotionGeneratorDataset
 
 class MotionGeneratorDataModule(pl.LightningDataModule):
-  def __init__(self, batch_size, data_url, tokenizer):
+  def __init__(self, batch_size, data_url, tokenizer, num_workers, pin_memory):
     super().__init__()
     self.batch_size = batch_size
     self.data_url = data_url
     self.tokenizer = tokenizer
+    self.num_workers = num_workers
+    self.pin_memory = pin_memory
 
   def prepare_data(self):
     response = requests.get(self.data_url)
@@ -61,10 +63,21 @@ class MotionGeneratorDataModule(pl.LightningDataModule):
     return infoslide_encodings, motion_encodings
 
   def train_dataloader(self):
-    return DataLoader(self.train_dataset, batch_size=self.batch_size, shuffle=True)
+    return DataLoader(
+      self.train_dataset,
+      batch_size=self.batch_size,
+      shuffle=True,
+      num_workers=self.num_workers,
+      pin_memory=self.pin_memory
+    )
 
   def val_dataloader(self):
-    return DataLoader(self.val_dataset, batch_size=self.batch_size)
+    return DataLoader(
+      self.val_dataset,
+      batch_size=self.batch_size, 
+      num_workers=self.num_workers,
+      pin_memory=self.pin_memory
+    )
 
   @staticmethod
   def add_argparse_args(parent_parser):
@@ -75,6 +88,16 @@ class MotionGeneratorDataModule(pl.LightningDataModule):
       "--data-url",
       type=str,
       default="https://docs.google.com/spreadsheets/u/2/d/1qQlqFeJ3iYbzXYrLBMgbmT6LcJLj6JcG3LJyZSbkAJY/export?format=csv"
+    )
+    parser.add_argument(
+      "--num_workers",
+      type=int,
+      default=0,
+    )
+    parser.add_argument(
+      "--pin_memory",
+      type=bool,
+      default=0,
     )
 
     return parser
